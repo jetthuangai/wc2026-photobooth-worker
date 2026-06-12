@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.safetensors
+.venv/
+.env
+.env.local
+*.log

@@ -1,0 +1,347 @@
+{
+  "76": {
+    "inputs": {
+      "image": "a2356f5102a9939f97208f0dee347090.jpg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "User image from Webcam"
+    }
+  },
+  "121": {
+    "inputs": {
+      "image": "2.avif"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Jersey shirt"
+    }
+  },
+  "151": {
+    "inputs": {
+      "model_family": "FLUX.2 Klein 9B",
+      "resolution_level": "3 MP",
+      "resize_mode": "cover_crop",
+      "resize_method": "lanczos",
+      "pad_color_hex": "#FFFFFF",
+      "image": [
+        "76",
+        0
+      ]
+    },
+    "class_type": "NH_SmartRatioImageResize",
+    "_meta": {
+      "title": "NH Smart Ratio Image Resize"
+    }
+  },
+  "152": {
+    "inputs": {
+      "model_family": "FLUX.2 Klein 9B",
+      "resolution_level": "2 MP",
+      "resize_mode": "cover_crop",
+      "resize_method": "lanczos",
+      "pad_color_hex": "#FFFFFF",
+      "image": [
+        "121",
+        0
+      ]
+    },
+    "class_type": "NH_SmartRatioImageResize",
+    "_meta": {
+      "title": "NH Smart Ratio Image Resize"
+    }
+  },
+  "158": {
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "class_type": "KSamplerSelect",
+    "_meta": {
+      "title": "KSamplerSelect"
+    }
+  },
+  "159": {
+    "inputs": {
+      "steps": 4,
+      "width": [
+        "168",
+        0
+      ],
+      "height": [
+        "168",
+        1
+      ]
+    },
+    "class_type": "Flux2Scheduler",
+    "_meta": {
+      "title": "Flux2Scheduler"
+    }
+  },
+  "160": {
+    "inputs": {
+      "cfg": 1,
+      "model": [
+        "164",
+        0
+      ],
+      "positive": [
+        "171",
+        0
+      ],
+      "negative": [
+        "170",
+        0
+      ]
+    },
+    "class_type": "CFGGuider",
+    "_meta": {
+      "title": "CFG Guider"
+    }
+  },
+  "161": {
+    "inputs": {
+      "noise": [
+        "163",
+        0
+      ],
+      "guider": [
+        "160",
+        0
+      ],
+      "sampler": [
+        "158",
+        0
+      ],
+      "sigmas": [
+        "159",
+        0
+      ],
+      "latent_image": [
+        "167",
+        0
+      ]
+    },
+    "class_type": "SamplerCustomAdvanced",
+    "_meta": {
+      "title": "SamplerCustomAdvanced"
+    }
+  },
+  "162": {
+    "inputs": {
+      "samples": [
+        "161",
+        0
+      ],
+      "vae": [
+        "173",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "163": {
+    "inputs": {
+      "noise_seed": 242256840339718
+    },
+    "class_type": "RandomNoise",
+    "_meta": {
+      "title": "RandomNoise"
+    }
+  },
+  "164": {
+    "inputs": {
+      "unet_name": "flux-2-klein-9b.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "Load Diffusion Model"
+    }
+  },
+  "165": {
+    "inputs": {
+      "clip_name": "qwen_3_8b.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "Load CLIP"
+    }
+  },
+  "166": {
+    "inputs": {
+      "conditioning": [
+        "176",
+        0
+      ]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "ConditioningZeroOut"
+    }
+  },
+  "167": {
+    "inputs": {
+      "width": [
+        "168",
+        0
+      ],
+      "height": [
+        "168",
+        1
+      ],
+      "batch_size": 1
+    },
+    "class_type": "EmptyFlux2LatentImage",
+    "_meta": {
+      "title": "Empty Flux 2 Latent"
+    }
+  },
+  "168": {
+    "inputs": {
+      "image": [
+        "151",
+        0
+      ]
+    },
+    "class_type": "GetImageSize",
+    "_meta": {
+      "title": "Get Image Size"
+    }
+  },
+  "169": {
+    "inputs": {
+      "pixels": [
+        "151",
+        0
+      ],
+      "vae": [
+        "173",
+        0
+      ]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "VAE Encode"
+    }
+  },
+  "170": {
+    "inputs": {
+      "conditioning": [
+        "175",
+        0
+      ],
+      "latent": [
+        "172",
+        0
+      ]
+    },
+    "class_type": "ReferenceLatent",
+    "_meta": {
+      "title": "ReferenceLatent"
+    }
+  },
+  "171": {
+    "inputs": {
+      "conditioning": [
+        "174",
+        0
+      ],
+      "latent": [
+        "172",
+        0
+      ]
+    },
+    "class_type": "ReferenceLatent",
+    "_meta": {
+      "title": "ReferenceLatent"
+    }
+  },
+  "172": {
+    "inputs": {
+      "pixels": [
+        "152",
+        0
+      ],
+      "vae": [
+        "173",
+        0
+      ]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "VAE Encode"
+    }
+  },
+  "173": {
+    "inputs": {
+      "vae_name": "Flux2-small-decode.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Load VAE"
+    }
+  },
+  "174": {
+    "inputs": {
+      "conditioning": [
+        "176",
+        0
+      ],
+      "latent": [
+        "169",
+        0
+      ]
+    },
+    "class_type": "ReferenceLatent",
+    "_meta": {
+      "title": "ReferenceLatent"
+    }
+  },
+  "175": {
+    "inputs": {
+      "conditioning": [
+        "166",
+        0
+      ],
+      "latent": [
+        "169",
+        0
+      ]
+    },
+    "class_type": "ReferenceLatent",
+    "_meta": {
+      "title": "ReferenceLatent"
+    }
+  },
+  "176": {
+    "inputs": {
+      "text": "Change the shirt of the characters in image 1 by the football jersey in image 2.\nkeep the character in image 1.\n\nImprove the quality, text, logo and texture of the Garment in image 2.\n\nchange background to professional football stadium stands.\neditorial photography. Lowkey light.\n\nRemove the shirts in image 1.\n",
+      "clip": [
+        "165",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Positive Prompt)"
+    }
+  },
+  "178": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "162",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  }
+}
