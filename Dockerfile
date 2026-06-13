@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
+FROM nvidia/cuda:13.0.3-cudnn-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -17,11 +17,13 @@ ARG COMFYUI_REF=master
 RUN git clone --depth 1 --branch ${COMFYUI_REF} https://github.com/comfyanonymous/ComfyUI.git ${COMFY_DIR}
 
 WORKDIR ${COMFY_DIR}
-# Cài cả 3 (torch/torchvision/torchaudio) cùng phiên bản + cùng build cu124 TRƯỚC.
-# Nếu thiếu torchaudio ở đây, `pip install -r requirements.txt` (ComfyUI cần torchaudio)
-# sẽ kéo torchaudio từ PyPI mặc định = bản CUDA 13 (libcudart.so.13) → mismatch → ComfyUI crash khi import.
+# Cài torch theo lệnh CHÍNH THỨC của ComfyUI (Comfy-Org/ComfyUI) cho NVIDIA:
+# latest stable torch/torchvision/torchaudio build cho CUDA 13 (cu130).
+# Base image phải là CUDA 13 (libcudart.so.13) để khớp — đây là root cause crash trước đó
+# (base cu124 cũ + torchaudio mặc định PyPI build cho cu13 → mismatch).
+# Cài torch TRƯỚC requirements.txt; ComfyUI để torch/vision/audio không pin nên sẽ giữ bản này.
 RUN python -m pip install --upgrade pip \
-    && python -m pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cu124 \
+    && python -m pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu130 \
     && python -m pip install -r requirements.txt
 
 RUN git clone --depth 1 https://github.com/jetthuangai/NH-Nodes.git ${COMFY_DIR}/custom_nodes/NH-Nodes \
