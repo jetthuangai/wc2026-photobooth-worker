@@ -115,8 +115,16 @@ def _read_output_image(history: dict) -> tuple[str, str]:
             fname = img_info["filename"]
             subfolder = img_info.get("subfolder", "")
             path = COMFY_OUTPUT_DIR / subfolder / fname
-            mime = "image/png" if fname.lower().endswith(".png") else "image/jpeg"
-            return base64.b64encode(path.read_bytes()).decode("ascii"), mime
+            # Re-encode to JPEG to keep the payload small (~0.5MB vs ~5MB PNG).
+            # The booth holds this data URL in memory on iPad Safari; a multi-MB
+            # PNG causes the tab to reload (losing in-memory state → bật về trang
+            # chọn đội). JPEG q90 is plenty for a 4x6 print.
+            img = Image.open(path)
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=90, optimize=True)
+            return base64.b64encode(buf.getvalue()).decode("ascii"), "image/jpeg"
     raise RuntimeError("ComfyUI history contains no images")
 
 
