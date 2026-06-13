@@ -13,3 +13,6 @@ test_payload.json
 test_user.jpg
 status_watch.log
 status_final.json
+
+# Local build secret (HF token) — never commit
+hf_token.txt

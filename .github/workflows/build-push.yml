@@ -1,9 +1,10 @@
 name: Build and push worker image
 
+# NOTE: the worker image bakes ~32GB of models, so it is ~40GB and CANNOT be
+# built on GitHub-hosted runners (insufficient disk). The image is built and
+# pushed locally (see Dockerfile header). This workflow is manual-only and kept
+# for reference; do not rely on it to build the model-baked image.
 on:
-  push:
-    branches: [main]
-    tags: ["v*"]
   workflow_dispatch: {}
 
 env:
