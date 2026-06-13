@@ -12,8 +12,11 @@ import runpod
 from PIL import Image
 
 COMFY_HOST = os.environ.get("COMFY_HOST", "http://127.0.0.1:8188")
-COMFY_INPUT_DIR = Path("/ComfyUI/input")
-COMFY_OUTPUT_DIR = Path("/ComfyUI/output")
+# ComfyUI workspace is /comfyui in the RunPod base image (lowercase). Derive the
+# input/output dirs from COMFY_DIR so the handler writes where ComfyUI reads.
+COMFY_DIR = Path(os.environ.get("COMFY_DIR", "/comfyui"))
+COMFY_INPUT_DIR = COMFY_DIR / "input"
+COMFY_OUTPUT_DIR = COMFY_DIR / "output"
 WORKFLOW_PATH = Path("/workflow_api.json")
 KITS_BASE_URL = os.environ.get("KITS_BASE_URL", "https://wc2026booth.fun/kits")
 
@@ -82,7 +85,14 @@ def _fetch_jersey(team_id: str, kit: str, dest: Path) -> None:
 
 def _queue_prompt(prompt: dict) -> str:
     r = requests.post(f"{COMFY_HOST}/prompt", json={"prompt": prompt}, timeout=30)
-    r.raise_for_status()
+    if not r.ok:
+        # ComfyUI returns node_errors detail in the body on a 400 — surface it
+        # instead of swallowing it behind raise_for_status().
+        try:
+            detail = json.dumps(r.json(), ensure_ascii=False)
+        except Exception:
+            detail = r.text
+        raise RuntimeError(f"ComfyUI /prompt {r.status_code}: {detail}")
     return r.json()["prompt_id"]
 
 
