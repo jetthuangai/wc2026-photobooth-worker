@@ -47,8 +47,31 @@ def _save_image_from_b64(b64_data: str, dest: Path) -> None:
     img.save(dest, format="JPEG", quality=92)
 
 
+_MANIFEST_CACHE = None
+
+
+def _get_manifest() -> dict:
+    global _MANIFEST_CACHE
+    if _MANIFEST_CACHE is None:
+        try:
+            r = requests.get(f"{KITS_BASE_URL.rstrip('/')}/manifest.json", timeout=10)
+            r.raise_for_status()
+            _MANIFEST_CACHE = r.json().get("teams", {})
+        except Exception:
+            _MANIFEST_CACHE = {}
+    return _MANIFEST_CACHE
+
+
 def _fetch_jersey(team_id: str, kit: str, dest: Path) -> None:
-    url = f"{KITS_BASE_URL}/{team_id}_{kit}.jpg"
+    # Manifest áo có 4 đuôi (.webp chính, .jpg, .png, .avif) → không hardcode .jpg.
+    # Đọc manifest.json để lấy đúng filename; fallback .jpg nếu không có entry.
+    team_entry = _get_manifest().get(team_id, {})
+    kit_path = team_entry.get(kit) or team_entry.get("home") or team_entry.get("away")
+    if kit_path:
+        filename = kit_path.split("/")[-1]
+        url = f"{KITS_BASE_URL.rstrip('/')}/{filename}"
+    else:
+        url = f"{KITS_BASE_URL.rstrip('/')}/{team_id}_{kit}.jpg"
     r = requests.get(url, timeout=30)
     r.raise_for_status()
     img = Image.open(io.BytesIO(r.content))

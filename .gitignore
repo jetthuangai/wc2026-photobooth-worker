@@ -5,3 +5,11 @@ __pycache__/
 .env
 .env.local
 *.log
+
+# Local test & ops artifacts (không thuộc image)
+patch_*.json
+poll.ps1
+test_payload.json
+test_user.jpg
+status_watch.log
+status_final.json

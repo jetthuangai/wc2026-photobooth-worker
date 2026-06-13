@@ -17,8 +17,11 @@ ARG COMFYUI_REF=master
 RUN git clone --depth 1 --branch ${COMFYUI_REF} https://github.com/comfyanonymous/ComfyUI.git ${COMFY_DIR}
 
 WORKDIR ${COMFY_DIR}
+# Cài cả 3 (torch/torchvision/torchaudio) cùng phiên bản + cùng build cu124 TRƯỚC.
+# Nếu thiếu torchaudio ở đây, `pip install -r requirements.txt` (ComfyUI cần torchaudio)
+# sẽ kéo torchaudio từ PyPI mặc định = bản CUDA 13 (libcudart.so.13) → mismatch → ComfyUI crash khi import.
 RUN python -m pip install --upgrade pip \
-    && python -m pip install torch==2.4.1 torchvision --index-url https://download.pytorch.org/whl/cu124 \
+    && python -m pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cu124 \
     && python -m pip install -r requirements.txt
 
 RUN git clone --depth 1 https://github.com/jetthuangai/NH-Nodes.git ${COMFY_DIR}/custom_nodes/NH-Nodes \
